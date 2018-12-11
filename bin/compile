@@ -5,18 +5,20 @@ indent() {
   sed -u 's/^/       /'
 }
 
-echo "-----> Found a .vendor_urls file"
-
 # Bail early but noisily
 if [ ! -s $1/.vendor_urls ]; then
   echo ".vendor_urls empty. Skipping." | indent
   exit 0
 fi
 
+echo "-----> Found a .vendor_urls file"
+
 cd $1
 
+ignore_comments='^[[:blank:]]*#'
+
 while read url; do
-  if [ -n "$url" ]; then # incase ensure_newline_at_eof_on_save is enabled
+  if [ -n "$url" ] && [[ ! $url =~ $ignore_comments ]]; then # incase ensure_newline_at_eof_on_save is enabled
     echo Vendoring $url | indent
 
     extension="${url##*.}" # http://stackoverflow.com/q/965053
